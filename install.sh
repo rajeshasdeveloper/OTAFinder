@@ -3,7 +3,7 @@
 export DEBIAN_FRONTEND=noninteractive
 
 # --- SETTINGS ---
-B_SH_URL="https://raw.githubusercontent.com/rajeshasdeveloper/OTAFinder/refs/heads/main/oplus.sh"
+B_SH_URL="https://raw.githubusercontent.com/EvGRaF87/OTAFinder/refs/heads/main/oplus.sh"
 
 # Colors
 GREEN="\e[32m"
