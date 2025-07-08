@@ -2,8 +2,8 @@
 
 export DEBIAN_FRONTEND=noninteractive
 
-# --- НАСТРОЙКИ ---
-B_SH_URL="https://raw.githubusercontent.com/EvGRaF87/OTAFinder/refs/heads/main/oplus.sh"
+# --- SETTINGS ---
+B_SH_URL="https://raw.githubusercontent.com/rajeshasdeveloper/OTAFinder/refs/heads/main/oplus.sh"
 
 # Colors
 GREEN="\e[32m"
@@ -12,89 +12,89 @@ BLUE="\e[34m"
 RED="\e[31m"
 RESET="\e[0m"
 
-# Пути
+# Paths
 OTA_DIR="$HOME/OTA"
 B_SH_PATH="$OTA_DIR/oplus.sh"
 REALME_OTA_BIN="/data/data/com.termux/files/usr/bin/realme-ota"
 
-# Вывод ошибки
+# Error output
 handle_error() {
-    echo -e "\n${RED}ОШИБКА: $1${RESET}"
-    echo -e "${YELLOW}Установка прервана.${RESET}"
+    echo -e "\n${RED}ERROR: $1${RESET}"
+    echo -e "${YELLOW}Installation aborted.${RESET}"
     exit 1
 }
 
-# --- НАЧАЛО СКРИПТА ---
+# --- START OF SCRIPT ---
 clear
 echo -e "${BLUE}=====================================================${RESET}"
-echo -e "${BLUE}==  Автоматический установщик OTAFindeR by SeRViP  ==${RESET}"
+echo -e "${BLUE}==         OTAFindeR Automatic Installer           ==${RESET}"
 echo -e "${BLUE}=====================================================${RESET}"
 echo ""
-echo -e "${YELLOW}Этот скрипт автоматически скачает и настроит всё необходимое.${RESET}"
-read -p "Нажмите [Enter] для начала..."
+echo -e "${YELLOW}This script will automatically download and configure everything you need.${RESET}"
+read -p "Press [Enter] to start..."
 
-# --- Шаг 1: Настройка хранилища и обновление пакетов ---
-echo -e "\n${GREEN}>>> Шаг 1: Настройка хранилища и обновление системы...${RESET}"
+# --- Step 1: Setting up storage and updating packages ---
+echo -e "\n${GREEN}>>> Step 1: Setting up storage and updating the system...${RESET}"
 termux-setup-storage
-mkdir -p "$OTA_DIR" || handle_error "Не удалось создать папку $OTA_DIR."
+mkdir -p "$OTA_DIR" || handle_error "Failed to create folder $OTA_DIR."
 
 DPKG_OPTIONS="-o Dpkg::Options::=--force-confold"
-pkg update -y || handle_error "Не удалось обновить списки пакетов."
-pkg upgrade -y $DPKG_OPTIONS || handle_error "Не удалось обновить пакеты."
-echo -e "${GREEN}Система Termux успешно обновлена.${RESET}"
+pkg update -y || handle_error "Failed to update package lists."
+pkg upgrade -y $DPKG_OPTIONS || handle_error "Failed to upgrade packages."
+echo -e "${GREEN}Termux system updated successfully.${RESET}"
 
-# --- Шаг 2: Установка зависимостей ---
-echo -e "\n${GREEN}>>> Шаг 2: Установка системных пакетов (python, git, tsu)...${RESET}"
-pkg install -y $DPKG_OPTIONS python python2 git tsu curl || handle_error "Не удалось установить системные пакеты."
-echo -e "${GREEN}Все системные пакеты установлены.${RESET}"
+# --- Step 2: Installing dependencies ---
+echo -e "\n${GREEN}>>> Step 2: Installing system packages (python, git, tsu)...${RESET}"
+pkg install -y $DPKG_OPTIONS python python2 git tsu curl || handle_error "Failed to install system packages."
+echo -e "${GREEN}All system packages are installed.${RESET}"
 
-# --- Шаг 3: Установка Python-модулей ---
-echo -e "\n${GREEN}>>> Шаг 3: Установка Python-модулей...${RESET}"
-pip install --upgrade pip wheel pycryptodome || handle_error "Не удалось установить wheel или pycryptodome."
-pip3 install --upgrade requests pycryptodome git+https://github.com/R0rt1z2/realme-ota || handle_error "Не удалось установить realme-ota."
+# --- Step 3: Installing Python modules ---
+echo -e "\n${GREEN}>>> Step 3: Installing Python modules...${RESET}"
+pip install --upgrade pip wheel pycryptodome || handle_error "Failed to install wheel or pycryptodome."
+pip3 install --upgrade requests pycryptodome git+https://github.com/R0rt1z2/realme-ota || handle_error "Failed to install realme-ota."
 
-# Права доступа
+# Permissions
 if [ -f "$REALME_OTA_BIN" ]; then
-    echo -e "${BLUE}Назначаем права на исполнение для realme-ota...${RESET}"
+    echo -e "${BLUE}Assigning execute permissions for realme-ota...${RESET}"
     chmod +x "$REALME_OTA_BIN"
 else
-    echo -e "${YELLOW}ПРЕДУПРЕЖДЕНИЕ: Не найден файл $REALME_OTA_BIN. Возможны проблемы в работе.${RESET}"
+    echo -e "${YELLOW}WARNING: File $REALME_OTA_BIN not found. Possible problems in operation.${RESET}"
 fi
-echo -e "${GREEN}Python-модули успешно установлены и настроены.${RESET}"
+echo -e "${GREEN}Python modules successfully installed and configured.${RESET}"
 
-# --- Шаг 4: Загрузка скрипта oplus.sh ---
-echo -e "\n${GREEN}>>> Шаг 4: Загрузка скрипта (oplus.sh)...${RESET}"
+# --- Step 4: Downloading the oplus.sh script ---
+echo -e "\n${GREEN}>>> Step 4: Downloading the script (oplus.sh)...${RESET}"
 
 if [ ! -d "$OTA_DIR" ]; then
   mkdir -p "$OTA_DIR"
   if [ $? -eq 0 ]; then
-    echo "Создана '$OTA_DIR' папка."
+    echo "Created '$OTA_DIR' folder."
   else
-    echo "Ошибка при создании папки '$OTA_DIR'."
+    echo "Error creating folder '$OTA_DIR'."
     exit 1
   fi
 else
-  echo "Папка '$OTA_DIR' уже существует."
+  echo "Folder '$OTA_DIR' already exists."
 fi
 
 curl -sL "$B_SH_URL" -o "$B_SH_PATH"
 
 if [ $? -ne 0 ]; then
-    handle_error "Не удалось скачать скрипт oplus.sh!"
+    handle_error "Failed to download the oplus.sh script!"
 fi
 if [ ! -f "$B_SH_PATH" ] || [ ! -s "$B_SH_PATH" ]; then
-    handle_error "Файл oplus.sh не был загружен или пуст! Проверьте URL и интернет-соединение."
+    handle_error "The oplus.sh file was not downloaded or is empty! Check the URL and internet connection."
 fi
-echo -e "${GREEN}Скрипт oplus.sh успешно загружен в $B_SH_PATH${RESET}"
+echo -e "${GREEN}The oplus.sh script was successfully downloaded to $B_SH_PATH${RESET}"
 
-# --- Шаг 5: Создание списка устройств devices.txt ---
-echo -e "\n${GREEN}>>> Шаг 5: Создание списка устройств devices.txt...${RESET}"
+# --- Step 5: Creating the devices.txt device list ---
+echo -e "\n${GREEN}>>> Step 5: Creating the devices.txt list...${RESET}"
 TXT_DIR="$HOME/"
 TXT_FILE="$TXT_DIR/devices.txt"
 
 chmod 700 -R "$TXT_DIR"
 
-echo -e "${BLUE}Создаем файл : $TXT_FILE...${RESET}"
+echo -e "${BLUE}Creating file: $TXT_FILE...${RESET}"
 {
   echo "OnePlus 13 IN|CPH2649IN|1B|A"
   echo "OnePlus 13 EU|CPH2653EEA|44|A"
@@ -119,34 +119,34 @@ echo -e "${BLUE}Создаем файл : $TXT_FILE...${RESET}"
 } > "$TXT_FILE"
 
 chmod +x "$TXT_FILE"
-echo -e "${GREEN}Файл 'devices.txt' успешно создан!${RESET}"
+echo -e "${GREEN}File 'devices.txt' created successfully!${RESET}"
 
-# --- Шаг 6: Создание ярлыка для виджета ---
-echo -e "\n${GREEN}>>> Шаг 6: Создание ярлыка...${RESET}"
+# --- Step 6: Creating a widget shortcut ---
+echo -e "\n${GREEN}>>> Step 6: Creating a shortcut...${RESET}"
 SHORTCUT_DIR="$HOME/.shortcuts"
 SHORTCUT_FILE="$SHORTCUT_DIR/OTAFindeR"
 
 mkdir -p "$SHORTCUT_DIR"
 chmod 700 -R "$SHORTCUT_DIR"
 
-echo -e "${BLUE}Создаем файл ярлыка: $SHORTCUT_FILE...${RESET}"
+echo -e "${BLUE}Creating shortcut file: $SHORTCUT_FILE...${RESET}"
 
 cat "$B_SH_PATH" >> "$SHORTCUT_FILE"
 
 chmod +x "$SHORTCUT_FILE"
-echo -e "${GREEN}Ярлык 'OTAFindeR' успешно создан!${RESET}"
+echo -e "${GREEN}Shortcut 'OTAFindeR' created successfully!${RESET}"
 
-# --- ЗАВЕРШЕНИЕ ---
+# --- COMPLETION ---
 clear
 echo -e "${GREEN}=============================================${RESET}"
-echo -e "${GREEN}     🎉 Установка успешно завершена! 🎉      ${RESET}"
+echo -e "${GREEN}     🎉 Installation completed successfully! 🎉      ${RESET}"
 echo -e "${GREEN}=============================================${RESET}"
 echo ""
-echo -e "${YELLOW}Что делать дальше:${RESET}"
-echo "1. Полностью закройте приложение Termux (командой 'exit')."
-echo "2. Перейдите на главный экран вашего телефона."
-echo "3. Добавьте виджет 'Termux'."
-echo "4. В списке доступных ярлыков должен появиться 'OTAFindeR'."
-echo "5. Нажмите на него, чтобы запустить скрипт поиска обновлений."
+echo -e "${YELLOW}What to do next:${RESET}"
+echo "1. Completely close the Termux application (with the 'exit' command)."
+echo "2. Go to your phone's home screen."
+echo "3. Add the 'Termux' widget."
+echo "4. 'OTAFindeR' should appear in the list of available shortcuts."
+echo "5. Click on it to run the update search script."
 echo ""
-echo -e "${BLUE}С Вами был${RESET}" "${RED}SeRViP!${RESET}"
+echo -e "${BLUE}With you was${RESET}" "${RED}SeRViP!${RESET}"
